@@ -1,0 +1,116 @@
+# Extraction and analysis of the data set
+
+```{r, include = FALSE}
+
+knitr::opts_chunk$set(echo=TRUE, eval = TRUE, message = FALSE, warning = FALSE, rows.print=5)
+
+```
+
+
+```{r, warnings = 'hide', message = FALSE}
+
+library(tidyverse) # Package with dplyr, tibble, readr, and others to help clean coding
+library(dataRetrieval) # Package to download data
+library(sf) # Geospatial package to plot and explore data
+library(mapview) # Simple interface to leaflet interactive maps
+library(broom) # Simplifies model outputs
+library(knitr) # Makes nice tables
+library(kableExtra) # Makes even nicer tables
+library(lubridate) # Makes working with dates easier
+library(ggthemes) # Makes plots prettier
+library(tidyr) # Makes multiple simultaneous models easier
+library(trend) # Allows us to explore trends
+library(data.table) #Allows to import files quickly and conveniently
+library(lmerTest)
+library(emmeans)
+library(multcompView)
+library(multcomp)
+```
+
+
+## Setting working directory
+
+```{r}
+#Setting working directory
+setwd(("D:/D/DISCPO D/CSU/PHD 2023_SPRING/Enviromental data analysis/Final-Project-Submission/Carbon_trend_project"))
+       
+#Binding 5 data set, each one correspond to each field, each one with four treatments ("Traditional_fallow" (control), 2. "Annual fallow", 3. "Perennial fallow", and 4."Alfalfa fallow")
+files<-list.files(pattern = ".csv")
+temp<-lapply(files, fread, sep =",")
+data<- rbindlist(temp, fill=TRUE)
+write.csv(data, file ="Alldataset_carbon_stocks.csv")
+
+#Calling complete data set
+Carbon_trends <- read.csv("D:/D/DISCPO D/CSU/PHD 2023_SPRING/Enviromental data analysis/Final-Project-Submission/Carbon_trend_project/Alldataset_carbon_stocks.csv")
+
+Carbon_trends$year<- as.factor(Carbon_trends$year) #Column year customized as factor
+str(Carbon_trends)
+
+```
+
+## Using modeling and coding approach
+
+```{r}
+# In order to understand the effect of agro-ecological practices (4 treatments) on the soil total carbon (%) after each 6 years of crop+treatments rotations. Data will be filter from 2020 to 2048 year time frame. 
+
+  #Assessing for normality with Shapiro test
+
+  #Nesting data by year due to we want compere emmeans after 6 years of crop-agroecological practice rotation across 50 years
+
+nesting_data_SE<- Carbon_trends%>%
+  filter(year %in% c(2020,2026,2032,2038, 2044,2048))%>%   #every 6 years
+  group_by(year)%>%
+  nest()
+head(nesting_data_SE)
+
+  #Defining a function to fit the linear mixed model and perform the Shapiro-Wilk test on the residuals for each year:
+  
+fit_lm_normality<-function(df=nesting_data_SE){
+   options(contrasts = c("contr.sum", "contr.poly"))
+mod<-lmer(pctC~Treatment+(1|Field), data = df)
+  shapiro_test<-shapiro.test(residuals(mod))
+  tibble(group = unique(df$year),
+         lmm_result = list(mod),
+          shapiro_wilk_statistic = shapiro_test$statistic,
+          shapiro_wilk_p_value = shapiro_test$p.value)
+  }
+
+  #Unnesting data 
+tidy_norm<-nesting_data_SE%>%
+    mutate(results = map(data,fit_lm_normality))%>%
+   unnest(results)
+
+  #Based on the Shapiro analysis our data is not normal distributed
+
+```
+
+## Re-analyzing data with transformed values (sqrt)
+
+```{r}
+
+#Transforming values and grouping and nesting by Year
+nesting_data_with_transf<- Carbon_trends%>%
+  mutate(sqr=sqrt(pctC))%>%
+  filter(year %in% c(2020,2026,2032,2038, 2044,2048))%>%   #Every 6 years crop rotation 
+  group_by(year)%>%
+  nest()
+head(nesting_data_with_transf)
+
+#Creating the function for the MODEL
+fit_lm_anova_SE<-function(df=nesting_data_with_transf[[1]]){
+  options(contrasts = c("contr.sum", "contr.poly"))
+mod<-lmer(sqr~Treatment+(1|Field), data = df)
+Anova<-anova(mod, ddf="Kenward-Roger") 
+}
+
+#Tiding and unnesting the model
+tidy_ANOVA_SE<-nesting_data_with_transf%>%
+    mutate(tidy_mod = map(data,fit_lm_anova_SE))%>%
+  unnest(tidy_mod)
+view(tidy_ANOVA_SE)
+
+
+#we can use .key="rename data columns"
+#summarize(Carbon = mean(sqr, na.rm = T))%>%
+
+```

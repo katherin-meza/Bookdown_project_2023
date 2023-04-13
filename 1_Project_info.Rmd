@@ -1,0 +1,29 @@
+# Research description
+
+```{r, include = FALSE}
+
+knitr::opts_chunk$set(echo=TRUE, eval = TRUE, message = FALSE, warning = FALSE, rows.print=5)
+
+```
+
+## Context of the following analysis
+
+```{r}
+
+#First Chapter of thesis dissertation:  "Exploring the sustainability of forage-based fallows in Peruvian Andean agriculture systems"
+
+# In this study, the percentage of Soil total carbon was considered as one indicator to determine sustainability 
+
+# I used the Daily Century ecosystem model(DayCent)(Hartman, 2018; Parton, 1996). This model was used to estimate the long-term soil C dynamics by treatment and each field locations after the introduction of forage-based fallow (tentative agro-ecological practice) within the Andean crop rotation.
+
+#This model has its own interface, which use several parameters to calculate the soil total carbon, for instance, historical soil managements, weather data, soil properties, crop rotation management, etc). 
+
+# In term of historical data, this model used three scenarios to perform the equilibrium: 1. natural condition which was run for 8000 year, 2. the most common 6 year crop base rotation which was run for 200 year, and 3. current 6 crop rotation + tentative agro-ecological practice rotation which was run for 300 years.
+
+# Regarding to the tentative agro-ecological practice, it was expressed as four treatments called: 1. "Traditional_fallow" (control), 2. "Annual fallow", 3. "Perennial fallow", and 4."Alfalfa fallow".
+
+#Daycent outcomes is given per month across across 8000 year (natural conditions), 200 year (common crop rotation), and the last 300 year which account for the effect of the agro-ecological practice).
+
+#For the purpose of this study, I used the last 300 years (crop-agroecological practice). From this time frame, I only extracted data from the first 50 years to analysis the percentage of total soil carbon trend across each agro-ecological practice (treatment).
+```
+

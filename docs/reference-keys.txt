@@ -1,0 +1,14 @@
+research-description
+context-of-the-following-analysis
+extraction-and-analysis-of-the-data-set
+setting-working-directory
+using-modeling-and-coding-approach
+re-analyzing-data-with-transformed-values-sqrt
+graph-over-50-years
+graphing-percentage-of-total-soil-carbon-over-50-years
+summary-description-and-analysis
+context-of-the-following-analysis.
+analysis-looking-at-percentage-of-total-soil-carbon-over-50-years
+using-modeling-and-coding-approach-1
+analyzing-data-with-sqrt-transformation
+graphing-percentage-of-total-soil-carbon-over-50-years-1

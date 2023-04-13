@@ -1,0 +1,44 @@
+# Graph over 50 years
+
+```{r, include = FALSE}
+
+knitr::opts_chunk$set(echo=TRUE, eval = TRUE, message = FALSE, warning = FALSE, rows.print=5)
+
+```
+
+## Graphing percentage of total soil carbon over 50 years
+
+```{r}
+#Summarizing data set
+summary_C<- Carbon_trends%>%
+  group_by(Treatment, year)%>%
+   summarise( 
+    n=n(),
+    mean=mean(pctC),
+    sd=sd(pctC),
+    se=sd/sqrt(n)) 
+summary_C
+
+#Graph Carbon trends
+
+data_new <- summary_C                                       # Duplicate data
+levels(data_new$Treatment) <- list("Alfalfa" = "Alfalfa fallow",        # Change factor levels
+                                "Annual" = "Annual fallow",
+                              "Perennial" = "Perennial fallow",
+                                "Traditional" = "Traditional_fallow")
+
+C_con_EROD<-ggplot(data_new, aes(year, mean,group=Treatment, color=Treatment)) + xlab("") + ylab("% Soil total carbon")+
+  geom_line() + 
+    geom_point(size=1)+
+    # scale_shape_discrete(name="Fallow type",
+    #                      breaks=c("Alfalfa fallow","Annual fallow", "Perennial fallow","Traditional_fallow"),
+    #                      labels=c("Alfalfa", "Annual", "Perennial","Traditional"))
+     guides(color = guide_legend(title = "Forage fallow type"))+
+  theme_bw()+
+ theme(axis.text=element_text(size=15, color="black"),axis.title=element_text(size=20), legend.title=element_text(size=18),legend.text=element_text(size=18), strip.text = element_text(size = 18), axis.text.x = element_text(angle = 45, hjust = 1))#+
+  #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  
+  C_con_EROD+  scale_y_continuous(limits=c(0,2.5)) 
+  
+  C_con_EROD
+```

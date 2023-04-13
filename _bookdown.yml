@@ -1,0 +1,4 @@
+language:
+  ui:
+    chapter_name: "Step "
+output_dir: "docs" #for github pages to find it
